@@ -159,7 +159,8 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
         my_settings["name"] = project_name
         json.dump(my_settings, file, indent=2)
     
-    new_leaf_script_in_folder(f"{project_path}/src", "init", root_module)
+    if root_module.get("class") == "ModuleScript":
+        new_leaf_script_in_folder(f"{project_path}/src", "init", root_module)
     
     for item in root_module.findall("Item"):
         recurse(f"{project_path}/src", item)
