@@ -7,7 +7,10 @@ At this point, it and its descendants will be converted into an rbxmx.
 
 ## Getting Started
 Ensure that you have Rojo installed, and that it is on your system PATH.
-The version of Rojo this was created for was 7.4.0.
+
+Ensure that your Rojo version is 7.4.0. (Cannot guarantee that it will work for other versions.)
+
+Install the `xmlx` Python library. (Used to parse the rbxmx files)
 
 Create an `input` folder in this directory.
 Place .rbxmx files into the `input` folder.
