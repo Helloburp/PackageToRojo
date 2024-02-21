@@ -10,7 +10,7 @@ Ensure that you have Rojo installed, and that it is on your system PATH.
 
 Ensure that your Rojo version is 7.4.0. (Cannot guarantee that it will work for other versions.)
 
-Install the `xmlx` Python library. (Used to parse the rbxmx files)
+Ensure that you have the package dependencies from the Pipfile.
 
 Create an `input` folder in this directory.
 Place .rbxmx files into the `input` folder.
