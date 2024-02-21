@@ -1,7 +1,12 @@
-# program state
+# Program state
 /input
 /output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+
+# Build
+build/
+dist/
+*.spec
