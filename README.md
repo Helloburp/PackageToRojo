@@ -14,6 +14,6 @@ Ensure that you have the package dependencies from the Pipfile.
 
 Create an `input` folder in this directory.
 Place .rbxmx files into the `input` folder.
-Run the script.
+Run `PackageToRojo.py`.
 
 Voila! Your projects should be generated in a new folder called `output`.
