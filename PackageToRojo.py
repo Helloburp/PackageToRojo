@@ -76,7 +76,7 @@ def new_parent_script(path: str, elem: ET.ElementBase):
 
 
 # Creates a new folder AT the path.
-def new_folder(path: str, elem: ET.ElementBase | None = None):
+def new_folder(path: str, elem=None):
     Path(path).mkdir(parents=True, exist_ok=True)
 
 
@@ -134,7 +134,8 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
 
     valid, root_module = validate_rbxmx_input(rbxmx_root)
     if not valid:
-        raise(ValueError(f"{project_name} is invalid .rbxmx input."))
+        print(f"{project_name} is not valid! Please make sure you only have one Root instance that is a Folder or ModuleScript.")
+        return
     
     new_folder("output")
     
@@ -146,7 +147,11 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
     new_folder(project_path)
 
 
-    cmd_run("rojo init", project_path)
+    print(f"Initializing Rojo project \"{project_name}\"")
+    process = cmd_run("rojo init", project_path)
+    if process.returncode != 0:
+        print(f"Project \"{project_name}\" failed to be initialized. Do you have Rojo installed properly? Return code: {process.returncode}")
+        return
 
     # Clear irrelevant children from default Rojo config
     shutil.rmtree(f"{project_path}/src/client")
@@ -154,6 +159,7 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
     shutil.rmtree(f"{project_path}/src/server")
 
     # Project .json
+    print("Writing default.project.json...")
     with open(f"{project_path}/default.project.json", "w") as file:
         my_settings = copy.deepcopy(PkgToRojoData.project_settings)
         my_settings["name"] = project_name
@@ -162,8 +168,11 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
     if root_module.get("class") == "ModuleScript":
         new_leaf_script_in_folder(f"{project_path}/src", "init", root_module)
     
+    print("Populating new project...")
     for item in root_module.findall("Item"):
         recurse(f"{project_path}/src", item)
+    print("Done!")
+    print("")
 
 
 # Ensures that the input rbxmx can be converted into a rojo project.
@@ -179,6 +188,7 @@ def validate_rbxmx_input(root: ET.ElementBase):
 
 def run(file_path):
     file_name = Path(file_path).name
+    print(f"Found \"{file_name}\".")
 
     if not Path(file_path).exists():
         print(f"{file_path} is not a valid .rbxmx file.")
@@ -187,15 +197,16 @@ def run(file_path):
     i = file_name.find(".rbxmx")
 
     if i < 0 or i != len(file_name) - len(".rbxmx"):
-        print("Not a valid .rbxmx file.")
+        print(f"{file_name} is not a valid .rbxmx file.")
         return
     
     project_name = file_name[0:i]
+    print(f"Validating \"{project_name}\"...")
     
     with open(file_path, "r") as file:
         root = ET.fromstring(file.read(), parser)
         if not validate_rbxmx_input(root):
-            print(".rbxmx exists, but its root is not a valid class.")
+            print(f"{file_path} is not valid! Please make sure you only have one Root instance that is a Folder or ModuleScript.")
             return
         
         rojo_init(project_name, root)
@@ -209,6 +220,8 @@ def get_rbxmx_in_directory(dir: str):
 def run_input():
     new_folder("input")
     rbxmx_paths = get_rbxmx_in_directory("input")
+    print(f"Found {len(rbxmx_paths)} .rbxmx files to convert!")
+    print("")
     for rbxmx_path in rbxmx_paths:
         run(rbxmx_path)
 
