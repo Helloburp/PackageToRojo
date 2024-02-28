@@ -7,11 +7,12 @@
 # 
 # Each ModuleScript will be given a meta file that will set its GUID for package parity.
 
+
 import copy, subprocess, json, shutil, glob
 from pathlib import Path
 
 import src.PkgToRojoData as PkgToRojoData
-from src.PkgToRojoParse import ET, get_packagelink_properties, get_module_properties, get_module_source, get_property_from_item_elem
+from src.PkgToRojoParse import ET, get_packagelink_properties, get_script_properties, get_script_source, get_property_from_item_elem
 
 parser = ET.XMLParser(strip_cdata=False)
 
@@ -45,19 +46,22 @@ def does_elem_have_children(elem: ET.ElementBase):
 
 # script_name is the filename of the script WITHIN the path, WITHOUT the extension of .luau
 def new_script_meta_json_in_folder(path: str, script_name: str, elem: ET.ElementBase):
+    properties = get_script_properties(elem)
+    if not properties:
+        return
+
     with open(f"{path}/{script_name}.meta.json","w") as file:
         meta = copy.deepcopy(PkgToRojoData.script_meta)
-        meta["properties"] = get_module_properties(elem)
+        meta["properties"] = properties
         json.dump(meta, file, indent=2)
 
 
 # Creates a new script IN the path, and a meta.json file.
 def new_leaf_script_in_folder(path: str, script_name: str, elem: ET.ElementBase):
     with open(f"{path}/{script_name}.luau", "w") as script:
-        script.write(get_module_source(elem))
+        script.write(get_script_source(elem))
     
-    # Currently disabled because it unfortunately doesn't fix the package commiting issue.
-    # new_script_meta_json_in_folder(path, script_name, elem)
+    new_script_meta_json_in_folder(path, script_name, elem)
 
 
 # Creates a new .model.json INSIDE the path representing a packagelink.
@@ -72,7 +76,8 @@ def new_packagelink_json_model_in_folder(path: str, elem: ET.ElementBase):
 # Creates a new folder AT the path, then an init.luau inside, and a init.meta.json file.
 def new_parent_script(path: str, elem: ET.ElementBase):
     new_folder(path)
-    new_leaf_script_in_folder(path, "init", elem)
+    my_class = elem.get("class")
+    new_leaf_script_in_folder(path, f"init{get_script_postfix(my_class)}", elem)
 
 
 # Creates a new folder AT the path.
@@ -96,7 +101,13 @@ def new_rbxmx_in_folder(path: str, rbxmx_name: str, elems: list[ET.ElementBase])
 #
 # process
 #
-        
+
+def get_script_postfix(class_name: str) -> str: 
+    return ".server" if class_name == "Script" else ".client" if class_name == "LocalScript" else ""
+
+def is_script(class_name: str) -> bool:
+    return class_name == "ModuleScript" or class_name == "Script" or class_name == "LocalScript"
+
 
 def sanitize_str(string: str):
     string = string.replace("/", "-")
@@ -117,9 +128,10 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
             new_rbxmx_in_folder(path, my_name, [elem])
             return
         
-        if my_class == "ModuleScript":
+        if is_script(my_class):
+            _my_name = f"{my_name}{get_script_postfix(my_class)}"
             if not does_elem_have_children(elem):
-                new_leaf_script_in_folder(path, my_name, elem)
+                new_leaf_script_in_folder(path, _my_name, elem)
                 return
             else:
                 new_parent_script(deeper_path, elem)
@@ -133,12 +145,14 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
             recurse(deeper_path, sub_elem)
 
     valid, root_module = validate_rbxmx_input(rbxmx_root)
+
     if not valid:
         print(f"{project_name} is not valid! Please make sure you only have one Root instance that is a Folder or ModuleScript.")
         return
     
     new_folder("output")
     
+    root_class = root_module.get("class")
     project_path = f"output/{project_name}"
 
     if Path(project_path).exists():
@@ -165,8 +179,8 @@ def rojo_init(project_name, rbxmx_root: ET.ElementBase):
         my_settings["name"] = project_name
         json.dump(my_settings, file, indent=2)
     
-    if root_module.get("class") == "ModuleScript":
-        new_leaf_script_in_folder(f"{project_path}/src", "init", root_module)
+    if is_script(root_class):
+        new_leaf_script_in_folder(f"{project_path}/src", f"init{get_script_postfix(root_class)}", root_module)
     
     print("Populating new project...")
     for item in root_module.findall("Item"):

@@ -3,14 +3,23 @@
 non_rbxmx_classes = {
     "PackageLink": True,
     "ModuleScript": True,
+    "Script": True,
+    "LocalScript": True,
     "Folder": True,
 }
 
-
 # The names of properties to to put in a meta json
-module_script_properties = {
-    "ScriptGuid": "string",
+client_script_properties = {
+    "Disabled": "bool",
+    # "ScriptGuid": "string",
 }
+
+server_script_properties = {
+    "Disabled": "bool",
+    "RunContext": "string"
+}
+
+
 packagelink_properties = {
     "AutoUpdate": "bool",
     "DefaultName": "string",

@@ -56,14 +56,21 @@ def get_properties(root_elem: ET.ElementBase, target_properties: dict[str, str])
     return vals
 
 
-def get_module_properties(elem):
-    return get_properties(elem, PkgToRojoData.module_script_properties)
+def get_script_properties(elem):
+    properties = {}
+    match elem.get("class"):
+        case "LocalScript":
+            properties = PkgToRojoData.client_script_properties
+        case "Script":
+            properties = PkgToRojoData.server_script_properties
+
+    return get_properties(elem, properties)
 
 
 def get_packagelink_properties(elem: ET.ElementBase):
     return get_properties(elem, PkgToRojoData.packagelink_properties)
 
-def get_module_source(elem: ET.ElementBase):
+def get_script_source(elem: ET.ElementBase):
     source = get_property_from_item_elem(elem, "Source", "string")
     source = source if source else ""
 
