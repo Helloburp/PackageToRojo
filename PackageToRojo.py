@@ -4,8 +4,8 @@
 # Will descend down the tree and place packagelinks and modulescripts respectively
 #   until a non-modulescript instance is found.
 #   At this point, it and its descendants will be converted into an rbxmx.
-# 
-# Each ModuleScript will be given a meta file that will set its GUID for package parity.
+
+# TODO: Support Shared Strings.
 
 
 import copy, subprocess, json, shutil, glob
