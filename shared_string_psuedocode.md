@@ -3,7 +3,7 @@
 ## Notes
 
 - There is only one SharedString per file.
-- The shared string is always appended after every item in the Roblox tag.
+- The shared string is always appended after the final item in the Roblox tag.
 - The format is the following:
 
     ```xml
@@ -12,7 +12,7 @@
         </SharedStrings>
     ```
 
-    And, within the properties of the model,
+    And, within the properties tag of the instance,
 
     ```xml
         <SharedString name="ModelMeshData">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
