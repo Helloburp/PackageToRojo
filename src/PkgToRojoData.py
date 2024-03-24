@@ -1,4 +1,18 @@
 
+def generate_sharedstring(md5_shared_str: str):
+        return f'''<SharedStrings>
+            <SharedString md5="{md5_shared_str}"></SharedString>
+        </SharedStrings>'''
+
+
+def generate_rbxmx_wrapper():
+    return f'''<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+</roblox>
+'''
+
 
 non_rbxmx_classes = {
     "PackageLink": True,
@@ -47,11 +61,3 @@ packagelink_model = {
     # FILLED BY SCRIPT: Properties of package link
     "Properties": {}
 }
-
-
-rbxmx_wrapper = '''<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
-	<Meta name="ExplicitAutoJoints">true</Meta>
-	<External>null</External>
-	<External>nil</External>
-</roblox>
-'''

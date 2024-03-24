@@ -12,7 +12,7 @@ import copy, subprocess, json, shutil, glob
 from pathlib import Path
 
 import src.PkgToRojoData as PkgToRojoData
-from src.PkgToRojoParse import ET, get_packagelink_properties, get_script_properties, get_script_source, get_property_from_item_elem
+from src.PkgToRojoParse import ET, get_packagelink_properties, get_script_properties, get_script_source, get_property_from_item_elem, get_shared_string_from_elem
 
 parser = ET.XMLParser(strip_cdata=False)
 
@@ -87,9 +87,20 @@ def new_folder(path: str, elem=None):
 
 # Creates a new .rbxmx IN the path.
 def new_rbxmx_in_folder(path: str, rbxmx_name: str, elems: list[ET.ElementBase]):
-    root = ET.fromstring(PkgToRojoData.rbxmx_wrapper)
+    md5_shared_string = None
+
+    for elem in elems:
+        md5_shared_string = get_shared_string_from_elem(elem)
+        if md5_shared_string:
+            break
+
+    root = ET.fromstring(PkgToRojoData.generate_rbxmx_wrapper())
     for elem in elems:
         root.append(elem)
+    
+    if md5_shared_string:
+        shared_strings = ET.fromstring(PkgToRojoData.generate_sharedstring(md5_shared_string))
+        root.append(shared_strings)
 
     rbxmx_path = f"{path}/{rbxmx_name}.rbxmx"
 

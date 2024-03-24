@@ -1,8 +1,13 @@
 
-# import xml.etree.ElementTree as ET
 import src.PkgToRojoData as PkgToRojoData
 import lxml.etree as ET
 
+
+def get_shared_string_from_elem(elem: ET.ElementBase):
+    for sub_elem in elem.iter("SharedString"):
+        shared_string = sub_elem.get("name") 
+        if shared_string == "ModelMeshData":
+            return sub_elem.text
 
 
 def get_value_from_property_elem(elem: ET.ElementBase, type: str="string"):
