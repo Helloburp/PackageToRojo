@@ -122,7 +122,6 @@ def is_script(class_name: str) -> bool:
 
 def sanitize_str(string: str):
     string = string.replace("/", "-")
-    string = string.replace(".", "-")
     return string
 
 def rojo_init(project_name, rbxmx_root: ET.ElementBase):
