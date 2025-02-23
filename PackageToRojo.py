@@ -227,7 +227,7 @@ def run(file_path):
     project_name = file_name[0:i]
     print(f"Validating \"{project_name}\"...")
     
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf8") as file:
         root = ET.fromstring(file.read(), parser)
         if not validate_rbxmx_input(root):
             print(f"{file_path} is not valid! Please make sure you only have one Root instance that is a Folder or ModuleScript.")
